@@ -84,7 +84,7 @@ export async function findFilesToUpload(
   includeHiddenFiles?: boolean
 ): Promise<SearchResult> {
   const searchResults: string[] = []
-  const globber = await glob.create(searchPath, getDefaultGlobOptions(false))
+  const globber = await glob.create(searchPath, getDefaultGlobOptions(true))
   const rawSearchResults: string[] = await globber.glob()
 
   /*
