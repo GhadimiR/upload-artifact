@@ -84,10 +84,7 @@ export async function findFilesToUpload(
   includeHiddenFiles?: boolean
 ): Promise<SearchResult> {
   const searchResults: string[] = []
-  const globber = await glob.create(
-    searchPath,
-    getDefaultGlobOptions(includeHiddenFiles || false)
-  )
+  const globber = await glob.create(searchPath, getDefaultGlobOptions(false))
   const rawSearchResults: string[] = await globber.glob()
 
   /*
@@ -96,11 +93,24 @@ export async function findFilesToUpload(
   */
   const set = new Set<string>()
 
+  /* 
+    Use this to keep track of it we've already logged a hidden file, to prevent printing the header message
+    multiple times.
+  */
+  let loggedFirstHiddenMessage = false
+
   /*
     Directories will be rejected if attempted to be uploaded. This includes just empty
     directories so filter any directories out from the raw search results
   */
   for (const searchResult of rawSearchResults) {
+    if (!includeHiddenFiles && path.basename(searchResult).match(/^\./)) {
+      if (!loggedFirstHiddenMessage) {
+        info(`Ignoring the following hidden files and directories`)
+      }
+      info(`- ${searchResult}`)
+      continue
+    }
     const fileStats = await stats(searchResult)
     // isDirectory() returns false for symlinks if using fs.lstat(), make sure to use fs.stat() instead
     if (!fileStats.isDirectory()) {
