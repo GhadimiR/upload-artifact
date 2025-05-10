@@ -104,7 +104,13 @@ export async function findFilesToUpload(
     directories so filter any directories out from the raw search results
   */
   for (const searchResult of rawSearchResults) {
-    if (!includeHiddenFiles && path.basename(searchResult).match(/^\./)) {
+    if (
+      !includeHiddenFiles &&
+      path
+        .normalize(searchResult)
+        .split(path.sep)
+        .some(segment => segment.startsWith('.'))
+    ) {
       if (!loggedFirstHiddenMessage) {
         info(`Ignoring the following hidden files and directories`)
         loggedFirstHiddenMessage = true
