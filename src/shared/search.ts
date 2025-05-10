@@ -107,6 +107,7 @@ export async function findFilesToUpload(
     if (!includeHiddenFiles && path.basename(searchResult).match(/^\./)) {
       if (!loggedFirstHiddenMessage) {
         info(`Ignoring the following hidden files and directories`)
+        loggedFirstHiddenMessage = true
       }
       info(`- ${searchResult}`)
       continue
